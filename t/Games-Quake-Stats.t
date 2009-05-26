@@ -7,7 +7,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 4;
+use Test::More tests => 7;
 BEGIN { use_ok('Games::Quake::Stats') };
 
 #########################
@@ -19,10 +19,21 @@ my $stats;
 
 
 ok($stats = Games::Quake::Stats->new(
-       _frag_data => [["ShovelTooth", "pigvana"], ["ShovelTooth", "L00p"],
-		      ["L00p", "ShovelTooth"], ["ShovelTooth", "pigvana"]]),
+       _frag_data => [["ShovelTooth", "pigvana"], 
+		      ["ShovelTooth", "L00p"],
+		      ["L00p", "ShovelTooth"], 
+		      ["ShovelTooth", "pigvana"],
+		      ["pigvana", "L00p"],
+       ]),
    'stats object created');
 
+
+is( $stats->times_fragged("pigvana"), 2, 'pigvana fragged 2 times');
+
+
+is( $stats->total_frags("pigvana"), 1, 'pigvana has 1 frag');
+
+is( $stats->times_fragged("ShovelTooth", "pigvana"), 2, 'shoveltooth got pigvana 2 times');
 
 ok($stats->generate_text(), 'text output generated');
 

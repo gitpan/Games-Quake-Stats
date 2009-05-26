@@ -1,6 +1,6 @@
 package Games::Quake::Stats;
 
-use 5.010000;
+
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 # Preloaded methods go here.
@@ -127,6 +127,73 @@ sub initialize{
 #    Subroutines
 #
 ########################################################################
+
+
+
+
+#-----------------------------------------------------------------------
+#
+# get_player
+#
+#-----------------------------------------------------------------------
+sub get_player{
+    my ($self, $player_name) = @_;
+
+    my $players = $self->{_players};
+
+    return $players->{$player_name};
+}
+
+
+
+#-----------------------------------------------------------------------
+#
+# times_fragged
+#
+#-----------------------------------------------------------------------
+sub times_fragged{
+    my ($self, $player_name1, $player_name2) = @_;
+    
+    my $player1 = $self->{_players}->{$player_name1};
+    
+    if(!$player1){
+	croak "times_fragged:  no such player ($player_name1)\n";
+    }
+    
+    if(!$player_name2){
+	return $player1->times_fragged();
+    }
+    else{
+	my $player2 = $self->{_players}->{$player_name2};
+	
+	if(!$player2){
+	    croak "times_fragged:  no such player ($player_name2)\n";
+	}
+	return $player1->times_fragged_player($player_name2);
+    }
+}
+
+
+#-----------------------------------------------------------------------
+#
+# player_total_frags
+#
+#-----------------------------------------------------------------------
+sub total_frags{
+    my ($self, $player_name) = @_;
+
+    my $player = $self->{_players}->{$player_name};
+    
+    if(!$player){
+	croak "total_frags:  no such player ($player_name)\n";
+    }
+
+    return $player->total_frags();
+}
+
+
+
+
 
 #-----------------------------------------------------------------------
 #
@@ -517,15 +584,34 @@ generate_stats_graph() and generate_skills_graph().
 
 Generate textual statistics output.
 
+
+=head2 total_frags()
+
+ my $total_frags = total_frags($player_name);
+
+Returns the number of frags a player has scored.
+
+
+=head2 times_fragged()
+
+ my $times_fragged = times_fragged($player_name);
+ my $times_fragged = times_fragged($player_name1, $player_name2);
+
+Returns the number of times a player has been fragged, or if a second player is provided, the
+number of times the first player has been fragged by the second.
+
+
+
 =head1 BUGS AND LIMITATIONS
 
-Unfortunately, at the moment the JPG graph generation can only accomodate about 10 or so players, due to a
+At the moment the JPG graph generation can only accomodate about 10 or so players, due to a
 limitation on the number of colors for the bars in the chart.    This will hopefully be addressed in a future
 release.
 
 
 =head1 DEPENDENCIES
 
+Test::More,
 Games::Quake::Player,
 GD::Graph::hbars,
 GD::Graph::colour
