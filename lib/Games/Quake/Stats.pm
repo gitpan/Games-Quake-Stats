@@ -1,5 +1,19 @@
 package Games::Quake::Stats;
 
+###################################################################################
+#
+# This module provides simple mechanisms for collecting and displaying game
+# statisitics for the Quake, Quake2, Quake2world, and Quake 3 games.   It works 
+# by  reading the fraglog file created by Quake servers.
+#
+# You can specify the fraglog file when the object is constructed, the module
+# compiles statistics for each player that appears in the log.
+#
+# The Games::Quake::Stats module can create simple bar charts showing
+# the relative statistics of each player, and can generate textual and pre-
+# formed HTML output (HTML output shows the graphs created).
+#
+###################################################################################
 
 use strict;
 use warnings;
@@ -31,7 +45,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 # Preloaded methods go here.
@@ -176,7 +190,7 @@ sub times_fragged{
 
 #-----------------------------------------------------------------------
 #
-# player_total_frags
+# total_frags
 #
 #-----------------------------------------------------------------------
 sub total_frags{
@@ -189,6 +203,28 @@ sub total_frags{
     }
 
     return $player->total_frags();
+}
+
+
+
+#-----------------------------------------------------------------------
+#
+# skill_level
+#
+#-----------------------------------------------------------------------
+sub skill_level{
+    my ($self, $player_name) = @_;
+
+    my $player = $self->{_players}->{$player_name};
+    
+    if(!$player){
+	croak "total_frags:  no such player ($player_name)\n";
+    }
+
+    my $total_frags = $player->total_frags();
+    my $times_fragged = $player->times_fragged(); 
+
+    return $total_frags/$times_fragged;
 }
 
 
@@ -496,7 +532,7 @@ Games::Quake::Stats - Perl module for compiling basic Quake game statistics
  
  # NOTE: 
  # 
- # This example supposes you want to use this modele in a CGI setting.
+ # This example supposes you want to use this module in a CGI setting.
  #
  #
  # If you configure your quake-server to write a fraglog in the directory 
@@ -512,8 +548,26 @@ Games::Quake::Stats - Perl module for compiling basic Quake game statistics
 					   
 
 
+ # number of times player 'player1' has been scored against
+ my $player1_fragged = $stats->times_fragged("player1");
+
+
+ # number of times player 'player1' has scored against 'player2'
+ my $player_total = $stats->total_frags("player1", "player2");
+ 
+
+ # total frags player 'player1' has scored
+ my $player_total = $stats->total_frags("player1");
+ 
+
+ # skill level of player 'player1' (total_scored/times_scored_against);
+ my $player_skill = $stats->skill_level("player1");
+
+
+
+
  # create graphs					   
- $quake_stats->generate_stats_graph();
+ $quake_stats->generate_stats_graph(); # or, generate_stats_graph("/var/www/html/stats/stats.jpg");
  $quake_stats->generate_skill_graph();
 
 
@@ -521,9 +575,13 @@ Games::Quake::Stats - Perl module for compiling basic Quake game statistics
  print "Content-type: text/html\r\n\r\n";    
 
  # Usually create graphs before calling this (as this example did above)
- $quake_stats->generate_html("http://192.168.85.100/stats/");
+ $quake_stats->generate_html("http://www.youraddress.net/stats/");
 
  exit (0);
+
+
+
+
 
 
 =head1 DESCRIPTION
@@ -585,6 +643,13 @@ generate_stats_graph() and generate_skills_graph().
 Generate textual statistics output.
 
 
+=head2 skill_level()
+
+ my $skill_level = skill_level($player_name);
+
+Returns the skill level of the player.   Skill level is defined as (total frags)/(times fragged).
+
+
 =head2 total_frags()
 
  my $total_frags = total_frags($player_name);
@@ -599,6 +664,8 @@ Returns the number of frags a player has scored.
 
 Returns the number of times a player has been fragged, or if a second player is provided, the
 number of times the first player has been fragged by the second.
+
+
 
 
 
@@ -630,7 +697,7 @@ Or if you use IRC, try the #quetoo channel on irc.freenode.net.
 
 =head1 AUTHOR
 
-Matthias Beebe, E<lt>matthiasbeebe@gmail.com<gt>
+Matthias Beebe, E<lt>matthiasbeebe@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

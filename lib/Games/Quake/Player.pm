@@ -100,7 +100,7 @@ sub update_stats {
 sub times_fragged_player
 {
     my ($self, $playername) = @_;
-
+    
     my $fraggee = Player->new(
 	_name => $playername,
 	);

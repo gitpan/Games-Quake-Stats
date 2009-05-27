@@ -1,4 +1,4 @@
-Games-Quake-Stats version 0.02
+Games-Quake-Stats version 0.03
 ==============================
 
 This module provides simple mechanisms for collecting and displaying game
@@ -18,17 +18,16 @@ Example Usage
 
  use strict;
  use Games::Quake::Stats;
-
-
+ 
  # NOTE: 
  # 
- # This example supposes you want to use this modele in a CGI setting.
+ # This example supposes you want to use this module in a CGI setting.
  #
  #
  # If you configure your quake-server to write a fraglog in the directory 
- # where the quake-server is run, you can create a symbolic link from the 
+ # where the quake-server is run, you can create a symbolic link from the
  # fraglog file to the file: /var/www/cgi-bin/fraglog.log (if that is where this
- # CGI application will reside).   This code will then read the statistics data
+ # CGI application will reside).  This code will then read the statistics data
  # from the *actual* file, while the quake-server deals only with a symbolically
  # linked file.
  #
@@ -38,19 +37,36 @@ Example Usage
 					   
 
 
+ # number of times player 'player1' has been scored against
+ my $player1_fragged = $stats->times_fragged("player1");
+
+
+ # number of times player 'player1' has scored against 'player2'
+ my $player_total = $stats->total_frags("player1", "player2");
+ 
+
+ # total frags player 'player1' has scored
+ my $player_total = $stats->total_frags("player1");
+ 
+
+ # skill level of player 'player1' (total_scored/times_scored_against);
+ my $player_skill = $stats->skill_level("player1");
+
+
+
+
  # create graphs					   
- $quake_stats->generate_stats_graph($graph_file);
- $quake_stats->generate_skill_graph($skill_graph_file);
+ $quake_stats->generate_stats_graph(); # or, generate_stats_graph("/var/www/html/stats/stats.jpg");
+ $quake_stats->generate_skill_graph();
 
 
  # If you are using this code as a CGI response:
  print "Content-type: text/html\r\n\r\n";    
 
- # create graphs before calling this (as this example did above)
- $quake_stats->generate_html("http://192.168.85.100/stats/");
+ # Usually create graphs before calling this (as this example did above)
+ $quake_stats->generate_html("http://www.youraddress.net/stats/");
 
  exit (0);
-
 
 
 
