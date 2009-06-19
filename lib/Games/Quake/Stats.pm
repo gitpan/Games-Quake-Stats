@@ -45,7 +45,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 # Preloaded methods go here.
@@ -414,11 +414,11 @@ sub generate_html{
 
     if($graph_file){
 	my @path_components = split('/', $graph_file);
-	my $graph_file_short = pop(@path_components);
+	$graph_file_short = pop(@path_components);
     }
     if($skill_graph_file){
 	my @path_components = split('/', $skill_graph_file);
-	my $skill_graph_file_short = pop(@path_components);
+	$skill_graph_file_short = pop(@path_components);
     }
 	
     print "<HTML>\n";
@@ -487,7 +487,15 @@ sub get_frag_data
     my @lines = <READF>;
     my @frags;
 
+    my $line_num = 0;
+    my $orig_line;
+
+
     foreach my $line (@lines){
+
+	$orig_line = $line;
+	$line_num++;
+	
 
 	# strip off the leading \ in a frag line:  "\pigvana\ShovelTooth\\n" becomes "pigvana\ShovelTooth\\n"
 	$line =~ s/^(\s\s*)*\\//; 
@@ -495,8 +503,10 @@ sub get_frag_data
 	$line =~ s/\\\n$//;
 	my @names = split(/\\/, $line);
 
+	
+
 	if(my $num_names = @names != 2){
-	    croak "Bad log file- format unknown.\n";
+	    croak "Bad log file- format unknown: (line $line_num) '$orig_line'\n";
 	}
 
 	push (@frags, \@names);
