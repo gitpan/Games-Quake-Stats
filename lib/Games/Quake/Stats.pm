@@ -45,7 +45,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 # Preloaded methods go here.
@@ -349,7 +349,7 @@ sub generate_skill_graph
     my @player_names;    
     my $max_y = 0;
     
-    push(@player_names, "skill (% frags/fragged)");
+    push(@player_names, "skill (frags/fragged * 100)");
 
     foreach my $player_name (sort(keys %$players)){
 	
